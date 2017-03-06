@@ -66,7 +66,7 @@ module Clockwork
 
       sig_read, sig_write = IO.pipe
 
-      %w[INT TERM HUP].each do |sig|
+      (%w[INT TERM HUP] & Signal.list.keys).each do |sig|
         trap sig do
           sig_write.puts(sig)
         end
