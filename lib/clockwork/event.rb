@@ -21,7 +21,10 @@ module Clockwork
 
     def run_now?(t)
       t = convert_timezone(t)
-      elapsed_ready(t) and (@at.nil? or @at.ready?(t)) and (@if.nil? or @if.call(t))
+      return false unless elapsed_ready?(t)
+      return false unless run_at?(t)
+      return false unless run_if?(t)
+      true
     end
 
     def thread?
@@ -57,8 +60,16 @@ module Clockwork
       @manager.handle_error e
     end
 
-    def elapsed_ready(t)
+    def elapsed_ready?(t)
       @last.nil? || (t - @last.to_i).to_i >= @period
+    end
+
+    def run_at?(t)
+      @at.nil? || @at.ready?(t)
+    end
+
+    def run_if?(t)
+      @if.nil? || @if.call(t)
     end
 
     def validate_if_option(if_option)
