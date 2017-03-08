@@ -8,11 +8,12 @@ module Clockwork
       @period = period
       @job = job
       @at = At.parse(options[:at])
-      @last = nil
       @block = block
       @if = options[:if]
       @thread = options.fetch(:thread, @manager.config[:thread])
       @timezone = options.fetch(:tz, @manager.config[:tz])
+      @skip_first_run = options[:skip_first_run]
+      @last = @skip_first_run ? convert_timezone(Time.now) : nil
     end
 
     def convert_timezone(t)
