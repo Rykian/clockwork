@@ -34,4 +34,41 @@ describe Clockwork::Event do
       end
     end
   end
+
+  describe '#run_now?' do
+    before do
+      @manager = Class.new
+      @manager.stubs(:config).returns({})
+    end
+
+    describe 'event skip_first_run option set to true' do
+      it 'returns false on first attempt' do
+        event = Clockwork::Event.new(@manager, 1, nil, nil, :skip_first_run => true)
+        assert_equal false, event.run_now?(Time.now)
+      end
+
+      it 'returns true on subsequent attempts' do
+        event = Clockwork::Event.new(@manager, 1, nil, nil, :skip_first_run => true)
+        # first run
+        event.run_now?(Time.now)
+
+        # second run
+        assert_equal true, event.run_now?(Time.now + 1)
+      end
+    end
+
+    describe 'event skip_first_run option not set' do
+      it 'returns true on first attempt' do
+        event = Clockwork::Event.new(@manager, 1, nil, nil)
+        assert_equal true, event.run_now?(Time.now + 1)
+      end
+    end
+
+    describe 'event skip_first_run option set to false' do
+      it 'returns true on first attempt' do
+        event = Clockwork::Event.new(@manager, 1, nil, nil, :skip_first_run => false)
+        assert_equal true, event.run_now?(Time.now)
+      end
+    end
+  end
 end
