@@ -4,6 +4,7 @@ STDERR.sync = STDOUT.sync = true
 
 require 'clockwork'
 require 'optparse'
+require 'pathname'
 
 begin
   require 'daemons'
@@ -45,7 +46,7 @@ opts = OptionParser.new do |opts|
   end
   opts.on('-c', '--clock=FILE',"Clock .rb file. Default is #{@options[:file]}.") do |clock_file|
     @options[:file] = clock_file
-    @options[:file] = "./#{@options[:file]}" unless @options[:file].match(/^[\/.]/)
+    @options[:file] = "./#{@options[:file]}" unless Pathname.new(@options[:file]).absolute?
     @options[:file] = File.expand_path(@options[:file])
   end
   opts.on('-d', '--dir=DIR', 'Directory to change to once the process starts') do |dir|
