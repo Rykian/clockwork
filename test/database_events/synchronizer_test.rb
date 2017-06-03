@@ -2,6 +2,7 @@ require "minitest/autorun"
 require 'mocha/setup'
 require 'time'
 require 'active_support/time'
+require 'byebug'
 
 require_relative '../../lib/clockwork'
 require_relative '../../lib/clockwork/database_events'
@@ -164,7 +165,7 @@ describe Clockwork::DatabaseEvents::Synchronizer do
       end
 
       describe "when #name is defined" do
-        it 'runs daily event with at from databse only once' do
+        it 'runs daily event with at from database only once' do
           DatabaseEventModel.create(:frequency => 1.day, :at => next_minute(@now).strftime('%H:%M'))
           setup_sync(model: DatabaseEventModel, :every => @sync_frequency, :events_run => @events_run)
 
@@ -176,7 +177,7 @@ describe Clockwork::DatabaseEvents::Synchronizer do
       end
 
       describe "when #name is not defined" do
-        it 'runs daily event with at from databse only once' do
+        it 'runs daily event with at from database only once' do
           DatabaseEventModelWithoutName.create(:frequency => 1.day, :at => next_minute(next_minute(@now)).strftime('%H:%M'))
           setup_sync(model: DatabaseEventModelWithoutName, :every => @sync_frequency, :events_run => @events_run)
 
@@ -221,12 +222,13 @@ describe Clockwork::DatabaseEvents::Synchronizer do
       end
 
       it 'runs event only once within the model frequency period' do
+        # creates one immediately, and another in 5 minutes.
         DatabaseEventModel.create(:frequency => 5.minutes)
         setup_sync(model: DatabaseEventModel, :every => 1.minute, :events_run => @events_run)
+        # We will let 9 minutes pass, so the model will have been created 2x only.
+        tick_at(@now, :and_every_second_for => 9.minutes)
 
-        tick_at(@now, :and_every_second_for => 5.minutes)
-
-        assert_equal 1, @events_run.length
+        assert_equal 2, @events_run.length
       end
     end
 

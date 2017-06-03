@@ -1,7 +1,7 @@
+require 'clockwork/manager/no_handler_defined'
+
 module Clockwork
   class Manager
-    class NoHandlerDefined < RuntimeError; end
-
     attr_reader :config
 
     def initialize
@@ -159,6 +159,7 @@ module Clockwork
     end
 
     private
+
     def events_to_run(t)
       @events.select{ |event| event.run_now?(t) }
     end

@@ -1,5 +1,3 @@
-require_relative './event_collection'
-
 # How EventStore and Clockwork manager events are kept in sync...
 #
 # The normal Clockwork::Manager is responsible for keeping track of
@@ -24,11 +22,8 @@ require_relative './event_collection'
 #   - it creates a new DatabaseEvents::Event
 #   - DatabaseEvents::Event#initialize registers it with the EventStore
 module Clockwork
-
   module DatabaseEvents
-
     class EventStore
-
       def initialize(block_to_perform_on_event_trigger)
         @related_events = {}
         @block_to_perform_on_event_trigger = block_to_perform_on_event_trigger
@@ -131,6 +126,5 @@ module Clockwork
         model.at.split(',').map(&:strip)
       end
     end
-
   end
 end

@@ -33,22 +33,23 @@ def normalize_time t
   t.is_a?(String) ? Time.parse(t) : t
 end
 
-
 class DatabaseEventModel
   include ActiveRecordFake
-  attr_accessor :name, :frequency, :at, :tz
+  attr_writer :name
+  attr_accessor :frequency, :at, :tz
 
   def name
-    @name || "#{self.class}:#{id}"
+    @name ||= "#{self.class}:#{id}"
   end
 end
 
 class DatabaseEventModel2
   include ActiveRecordFake
-  attr_accessor :name, :frequency, :at, :tz
+  attr_writer :name
+  attr_accessor :frequency, :at, :tz
 
   def name
-    @name || "#{self.class}:#{id}"
+    @name ||= "#{self.class}:#{id}"
   end
 end
 
@@ -59,10 +60,11 @@ end
 
 class DatabaseEventModelWithIf
   include ActiveRecordFake
-  attr_accessor :name, :frequency, :at, :tz, :if_state
+  attr_writer :name
+  attr_accessor :frequency, :at, :tz, :if_state
 
   def name
-    @name || "#{self.class}:#{id}"
+    @name ||= "#{self.class}:#{id}"
   end
 
   def if?(time)

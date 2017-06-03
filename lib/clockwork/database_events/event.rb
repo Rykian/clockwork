@@ -1,9 +1,6 @@
 module Clockwork
-
   module DatabaseEvents
-
     class Event < Clockwork::Event
-
       attr_accessor :event_store, :model_attributes
 
       def initialize(manager, period, job, block, event_store, model_attributes, options={})
@@ -29,6 +26,5 @@ module Clockwork
         @period
       end
     end
-
   end
 end

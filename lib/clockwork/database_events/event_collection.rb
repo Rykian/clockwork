@@ -1,7 +1,6 @@
 module Clockwork
   module DatabaseEvents
     class EventCollection
-
       def initialize(manager=Clockwork.manager)
         @events = []
         @manager = manager

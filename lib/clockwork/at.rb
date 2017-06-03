@@ -1,7 +1,7 @@
+require 'clockwork/at/failed_to_parse'
+
 module Clockwork
   class At
-    class FailedToParse < StandardError; end
-
     NOT_SPECIFIED = nil
     WDAYS = %w[sunday monday tuesday wednesday thursday friday saturday].each.with_object({}).with_index do |(w, wdays), index|
       [w, w.capitalize, w[0...3], w[0...3].capitalize].each do |k|
@@ -53,6 +53,7 @@ module Clockwork
     end
 
     private
+
     def valid?
       @min == NOT_SPECIFIED || (0..59).cover?(@min) &&
         @hour == NOT_SPECIFIED || (0..23).cover?(@hour) &&

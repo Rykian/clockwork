@@ -50,6 +50,7 @@ module Clockwork
     end
 
     private
+
     def execute
       @block.call(@job, @last)
     rescue => e

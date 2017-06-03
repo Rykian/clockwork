@@ -1,11 +1,9 @@
 module ActiveRecordFake
-
   def self.included(base)
     base.instance_variable_set(:@items, [])
-    base.instance_variable_set(:@next_id, 1)    
+    base.instance_variable_set(:@next_id, 1)
     base.extend(ClassMethods)
   end
-
 
   attr_accessor :id
 
@@ -28,10 +26,10 @@ module ActiveRecordFake
   end
 
   module ClassMethods
-    def create *args
-      new *args
+    def create(*args)
+      new(*args)
     end
-    
+
     def delete_all
       @items.clear
       reset_id
@@ -41,8 +39,8 @@ module ActiveRecordFake
     def all
       @items.dup
     end
-    
-    
+
+
     def add instance
       @items << instance
     end
@@ -64,7 +62,7 @@ module ActiveRecordFake
 
   private
 
-    def set_attribute_values_from_options options
-      options.each{|attr, value| self.send("#{attr}=".to_sym, value) }
-    end
+  def set_attribute_values_from_options options
+    options.each{|attr, value| self.send("#{attr}=".to_sym, value) }
+  end
 end
