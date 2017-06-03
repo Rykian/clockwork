@@ -357,7 +357,6 @@ Clockwork wakes up once a second and performs its duties. To change the number o
 sleeps, set the `sleep_timeout` configuration option as shown below in the example.
 
 From 1.1.0, Clockwork does not accept `sleep_timeout` less than 1 seconds.
-This restriction is introduced to solve more severe bug [#135](https://github.com/tomykaira/clockwork/pull/135).
 
 ### :tz
 
@@ -527,7 +526,7 @@ For more details, you can run `clockworkd -h`.
 Issues and Pull requests
 ------------------------
 
-If you find a bug, please create an issue - [Issues · tomykaira/clockwork](https://github.com/tomykaira/clockwork/issues).
+If you find a bug, please create an issue - [Issues · Rykian/clockwork](https://github.com/Rykian/clockwork/issues).
 
 For a bug fix or a feature request, please send a pull-request.
 Do not forget to add tests to show how your feature works, or what bug is fixed.
@@ -543,8 +542,8 @@ Use cases
 
 Feel free to add your idea or experience and send a pull-request.
 
-- [Sending errors to Airbrake](https://github.com/tomykaira/clockwork/issues/58)
-- [Read events from a database](https://github.com/tomykaira/clockwork/issues/25)
+- Sending errors to Airbrake
+- Read events from a database
 
 Meta
 ----
@@ -559,4 +558,4 @@ Patches contributed by Mark McGranaghan and Lukáš Konarovský
 
 Released under the MIT License: http://www.opensource.org/licenses/mit-license.php
 
-http://github.com/tomykaira/clockwork
+https://github.com/Rykian/clockwork
