@@ -341,6 +341,19 @@ Clockwork.every(1.day, 'run.me.in.new.thread', :thread => true)
 
 If a job is long-running or IO-intensive, this option helps keep the clock precise.
 
+### :skip_first_run
+
+Normally, a clockwork process that is defined to run in a specified period will run at startup.
+This is sometimes undesired behaviour, if the action being run relies on other processes booting which may be slower than clock.
+To avoid this problem, `:skip_first_run` can be used.
+
+```ruby
+Clockwork.every(5.minutes, 'myjob', :skip_first_run => true)
+```
+
+The above job will not run at initial boot, and instead run every 5 minutes after boot.
+
+
 Configuration
 -----------------------
 
