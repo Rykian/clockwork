@@ -1,4 +1,5 @@
 require 'logger'
+require 'tzinfo'
 
 require 'clockwork/at'
 require 'clockwork/event'
