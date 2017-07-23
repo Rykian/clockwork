@@ -2,7 +2,6 @@ require File.expand_path('../../lib/clockwork', __FILE__)
 require "minitest/autorun"
 require 'mocha/setup'
 require 'time'
-require 'active_support/time'
 
 describe 'Clockwork::At' do
   def time_in_day(hour, minute)

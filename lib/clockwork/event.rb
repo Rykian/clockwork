@@ -16,7 +16,7 @@ module Clockwork
     end
 
     def convert_timezone(t)
-      @timezone ? t.in_time_zone(@timezone) : t
+      @timezone ? t.getlocal(TZInfo::Timezone.get(@timezone).period_for_utc(t).utc_total_offset) : t
     end
 
     def run_now?(t)
