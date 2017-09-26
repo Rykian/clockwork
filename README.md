@@ -58,8 +58,8 @@ Quickstart for Heroku
 
 Clockwork fits well with heroku's cedar stack.
 
-Consider to use [clockwork-init.sh](https://gist.github.com/1312172) to create
-a new project for heroku.
+Consider using [clockwork-init.sh](https://gist.github.com/tomykaira/1312172) to create
+a new project for Heroku.
 
 Use with queueing
 -----------------
