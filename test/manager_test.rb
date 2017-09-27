@@ -185,6 +185,32 @@ describe Clockwork::Manager do
       assert_will_run 'jan 1 2010 18:10:00'
       assert_wont_run 'jan 1 2010 18:10:01'
     end
+
+    it "once a day with :skip_first_run" do
+      @manager.every(5.minutes, 'myjob', :at => "16:20", :skip_first_run => true)
+
+      assert_wont_run 'jan 1 2010 16:19:59'
+      assert_wont_run 'jan 1 2010 16:20:00'
+      assert_wont_run 'jan 1 2010 16:20:01'
+      assert_wont_run 'jan 2 2010 16:19:59'
+      assert_will_run 'jan 2 2010 16:20:00'
+      assert_will_run 'jan 3 2010 16:20:00'
+    end
+
+    it "twice a day with :skip_first_run" do
+      @manager.every(1.day, 'myjob', :at => ['16:20', '18:10'], :skip_first_run => true)
+
+      assert_wont_run 'jan 1 2010 16:19:59'
+      assert_will_run 'jan 1 2010 16:20:00'
+      assert_wont_run 'jan 1 2010 16:20:01'
+
+      assert_wont_run 'jan 1 2010 18:09:59'
+      assert_will_run 'jan 1 2010 18:10:00'
+      assert_wont_run 'jan 1 2010 18:10:01'
+
+      assert_will_run 'jan 2 2010 16:20:00'
+      assert_will_run 'jan 2 2010 18:10:00'
+    end
   end
 
   describe ':tz option' do
