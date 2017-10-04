@@ -161,8 +161,6 @@ module Clockwork
     private
     def events_to_run(t)
       events_to_run = @events.select{ |event| event.run_now?(t) }
-      puts "check"
-      puts events_to_run
       clear_first_run_skips(events_to_run)
     end
 
@@ -183,7 +181,6 @@ module Clockwork
     def clear_first_run_skips(events_to_run)
       skippable_events = events_to_run.select(&:skip_first_run)
       return events_to_run if skippable_events.empty?
-      puts @events.select(&:skip_first_run)
       events_to_run.reject!(&:skip_first_run)
       skippable_events.each do |event|
         clear_skips(event)
