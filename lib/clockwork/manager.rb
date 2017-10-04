@@ -160,7 +160,10 @@ module Clockwork
 
     private
     def events_to_run(t)
-      @events.select{ |event| event.run_now?(t) }
+      events_to_run = @events.select{ |event| event.run_now?(t) }
+      puts "check"
+      puts events_to_run
+      clear_first_run_skips(events_to_run)
     end
 
     def register(period, job, block, options)
@@ -174,6 +177,25 @@ module Clockwork
       options[:at].each do |at|
         each_options[:at] = at
         register(period, job, block, each_options)
+      end
+    end
+
+    def clear_first_run_skips(events_to_run)
+      skippable_events = events_to_run.select(&:skip_first_run)
+      return events_to_run if skippable_events.empty?
+      puts @events.select(&:skip_first_run)
+      events_to_run.reject!(&:skip_first_run)
+      skippable_events.each do |event|
+        clear_skips(event)
+        event.last = Time.now
+      end
+      events_to_run
+    end
+
+    def clear_skips(event)
+      return unless event.skip_first_run
+      @events.select { |e| e.to_s == event.to_s }.each do |selected_event|
+        selected_event.skip_first_run = false
       end
     end
   end

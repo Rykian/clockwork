@@ -2,6 +2,7 @@ require File.expand_path('../../lib/clockwork', __FILE__)
 require "minitest/autorun"
 require 'mocha/setup'
 require 'time'
+require 'timecop'
 require 'active_support/time'
 
 describe Clockwork::Manager do
@@ -198,10 +199,10 @@ describe Clockwork::Manager do
     end
 
     it "twice a day with :skip_first_run" do
-      @manager.every(1.day, 'myjob', :at => ['16:20', '18:10'], :skip_first_run => true)
+      @manager.every(1.day, 'myjob', :at => ['18:10', '16:20'], :skip_first_run => true)
 
       assert_wont_run 'jan 1 2010 16:19:59'
-      assert_will_run 'jan 1 2010 16:20:00'
+      assert_wont_run 'jan 1 2010 16:20:00'
       assert_wont_run 'jan 1 2010 16:20:01'
 
       assert_wont_run 'jan 1 2010 18:09:59'

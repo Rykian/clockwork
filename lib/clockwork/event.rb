@@ -1,6 +1,6 @@
 module Clockwork
   class Event
-    attr_accessor :job, :last
+    attr_accessor :job, :last, :skip_first_run
 
     def initialize(manager, period, job, block, options={})
       validate_if_option(options[:if])
@@ -12,8 +12,8 @@ module Clockwork
       @if = options[:if]
       @thread = options.fetch(:thread, @manager.config[:thread])
       @timezone = options.fetch(:tz, @manager.config[:tz])
-      @skip_first_run = options[:skip_first_run]
-      @last = @skip_first_run ? convert_timezone(Time.now) : nil
+      @skip_first_run = options.fetch(:skip_first_run, false)
+      @last = nil
     end
 
     def convert_timezone(t)
