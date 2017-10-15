@@ -160,7 +160,14 @@ module Clockwork
 
     private
     def events_to_run(t)
-      @events.select{ |event| event.run_now?(t) }
+      @events.select do |event|
+        begin
+          event.run_now?(t)
+        rescue => e
+          log_error(e)
+          false
+        end
+      end
     end
 
     def register(period, job, block, options)
