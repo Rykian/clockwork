@@ -1,7 +1,7 @@
 module Clockwork
   class Manager
     class NoHandlerDefined < RuntimeError; end
-    class DuplicateEventNames < RunTimeError; end
+    class DuplicateEventNames < RuntimeError; end
 
     attr_reader :config
 
@@ -55,7 +55,7 @@ module Clockwork
       end
 
       if job == "unnamed"
-        job += @incrementer
+        job += "_#{@incrementer}"
         @incrementer += 1
       end
 
