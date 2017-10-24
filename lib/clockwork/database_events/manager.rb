@@ -8,7 +8,7 @@ module Clockwork
         @events.delete(event)
       end
 
-      def register(period, job, block, options)
+      def register(period, job, block, options, _skip_duplicate_check = false)
         @events << if options[:from_database]
           synchronizer = options.fetch(:synchronizer)
           model_attributes = options.fetch(:model_attributes)
