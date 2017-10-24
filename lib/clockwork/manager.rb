@@ -175,7 +175,7 @@ module Clockwork
     def register(period, job, block, options, skip_duplicate_check = false)
       event = Event.new(self, period, job, block || handler, options)
       if @event_names.include?(job)
-        raise DuplicateNameError unless skip_duplicate_check
+        raise(DuplicateEventNames, "#{job} is identical to another event") unless skip_duplicate_check
       end
       @event_names << job
       @events << event

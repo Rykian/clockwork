@@ -80,6 +80,13 @@ describe Clockwork::Manager do
     end
   end
 
+  it "aborts when there are multiple jobs with the same name" do
+    assert_raises(Clockwork::Manager::DuplicateEventNames) do
+      @manager.every(1.minute, "jobx")
+      @manager.every(2.minutes, "jobx")
+    end
+  end
+
   it "general handler" do
     $set_me = 0
     @manager.handler { $set_me = 1 }
