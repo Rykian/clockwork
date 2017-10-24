@@ -1,11 +1,13 @@
 module Clockwork
   class Manager
     class NoHandlerDefined < RuntimeError; end
+    class DuplicateEventNames < RunTimeError; end
 
     attr_reader :config
 
     def initialize
       @events = []
+      @event_names = []
       @callbacks = {}
       @config = default_configuration
       @handler = nil
@@ -163,8 +165,12 @@ module Clockwork
       @events.select{ |event| event.run_now?(t) }
     end
 
-    def register(period, job, block, options)
+    def register(period, job, block, options, skip_duplicate_check = false)
       event = Event.new(self, period, job, block || handler, options)
+      if @event_names.include?(job)
+        raise DuplicateNameError unless skip_duplicate_check
+      end
+      @event_names << job
       @events << event
       event
     end
@@ -173,7 +179,7 @@ module Clockwork
       each_options = options.clone
       options[:at].each do |at|
         each_options[:at] = at
-        register(period, job, block, each_options)
+        register(period, job, block, each_options, true)
       end
     end
   end
