@@ -8,6 +8,7 @@ module Clockwork
     def initialize
       @events = []
       @event_names = []
+      @incrementer = 0
       @callbacks = {}
       @config = default_configuration
       @handler = nil
@@ -52,6 +53,12 @@ module Clockwork
         options = job
         job = "unnamed"
       end
+
+      if job == "unnamed"
+        job += @incrementer
+        @incrementer += 1
+      end
+
       if options[:at].respond_to?(:each)
         every_with_multiple_times(period, job, options, &block)
       else
