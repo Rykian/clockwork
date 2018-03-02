@@ -6,6 +6,6 @@ platforms :rbx do
   gem 'rubinius-developer_tools'
 end
 
-gem 'activesupport', '~> 4.2'
+gem 'activesupport', '~> 5.0'
 gem 'minitest', '~> 5.0'
 gemspec :path=>"../"
