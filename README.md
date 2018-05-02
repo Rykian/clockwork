@@ -332,7 +332,8 @@ If this is a problem, please use the `:thread` option to prevent the long runnin
 ```ruby
 every(1.day, 'reminders.send', :at => '00:00', :tz => 'UTC')
 # Runs the job each day at midnight, UTC.
-# The value for :tz can be anything supported by [TZInfo](http://tzinfo.rubyforge.org/)
+# The value for :tz can be anything supported by [TZInfo](https://github.com/tzinfo/tzinfo)
+# Using the 'tzinfo' gem, run TZInfo::Timezone.all_identifiers to get a list of acceptable identifiers.
 ```
 
 ### :if
