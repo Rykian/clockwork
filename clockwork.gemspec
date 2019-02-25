@@ -19,7 +19,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency(%q<tzinfo>)
 
-  s.add_development_dependency "bundler", "~> 1.3"
   s.add_development_dependency "rake"
   s.add_development_dependency "activesupport"
   s.add_development_dependency "daemons"
