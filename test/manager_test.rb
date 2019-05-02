@@ -2,6 +2,7 @@ require File.expand_path('../../lib/clockwork', __FILE__)
 require "minitest/autorun"
 require 'mocha/setup'
 require 'time'
+require 'timecop'
 require 'active_support/time'
 
 describe Clockwork::Manager do
@@ -184,6 +185,36 @@ describe Clockwork::Manager do
       assert_wont_run 'jan 1 2010 18:09:59'
       assert_will_run 'jan 1 2010 18:10:00'
       assert_wont_run 'jan 1 2010 18:10:01'
+    end
+
+    it "once a day with :skip_first_run" do
+      Timecop.travel Time.new(2010, 1, 1, 16, 19, 59) do
+        @manager.every(5.minutes, 'myjob', :at => "16:20", :skip_first_run => true)
+
+        assert_wont_run 'jan 1 2010 16:19:59'
+        assert_wont_run 'jan 1 2010 16:20:00'
+        assert_wont_run 'jan 1 2010 16:20:01'
+        assert_wont_run 'jan 2 2010 16:19:59'
+        assert_will_run 'jan 2 2010 16:20:00'
+        assert_will_run 'jan 3 2010 16:20:00'
+      end
+    end
+
+    it "twice a day with :skip_first_run" do
+      Timecop.travel Time.new(2010, 1, 1, 16, 19, 59) do
+        @manager.every(1.day, 'myjob', :at => ['18:10', '16:20'], :skip_first_run => true)
+
+        assert_wont_run 'jan 1 2010 16:19:59'
+        assert_wont_run 'jan 1 2010 16:20:00'
+        assert_wont_run 'jan 1 2010 16:20:01'
+
+        assert_wont_run 'jan 1 2010 18:09:59'
+        assert_will_run 'jan 1 2010 18:10:00'
+        assert_wont_run 'jan 1 2010 18:10:01'
+
+        assert_will_run 'jan 2 2010 16:20:00'
+        assert_will_run 'jan 2 2010 18:10:00'
+      end
     end
   end
 
