@@ -75,7 +75,7 @@ module Clockwork
 
     def validate_if_option(if_option)
       return unless if_option
-      unless if_option.respond_to?(:call) && if_option.arity == 1
+      unless if_option.respond_to?(:call) && if_option.respond_to?(:arity) && if_option.arity == 1
         raise ArgumentError.new(':if expects a callable object that accepts a single argument, but #{if_option} is not')
       end
     end
