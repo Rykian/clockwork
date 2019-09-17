@@ -260,6 +260,12 @@ describe Clockwork::Manager do
         @manager.every(1.second, 'myjob', :if => true)
       end
     end
+
+    it ":if does not have an arity of 1 then raise ArgumentError" do
+      assert_raises(ArgumentError) do
+        @manager.every(1.second, 'myjob', :if => lambda {})
+      end
+    end
   end
 
   describe "max_threads" do
