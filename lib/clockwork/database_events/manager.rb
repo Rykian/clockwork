@@ -1,9 +1,6 @@
 module Clockwork
-
   module DatabaseEvents
-
     class Manager < Clockwork::Manager
-
       def unregister(event)
         @events.delete(event)
       end

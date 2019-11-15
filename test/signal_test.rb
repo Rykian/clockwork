@@ -25,7 +25,7 @@ class SignalTest < Test::Unit::TestCase
     assert_equal 'done', File.read(LOGFILE)
   end
 
-  test 'should forcely shutdown with SIGINT' do
+  test 'should force shutdown with SIGINT' do
     Process.kill(:INT, @pid)
     sleep 0.2
     assert_equal 'start', File.read(LOGFILE)
