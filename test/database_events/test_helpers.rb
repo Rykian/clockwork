@@ -36,19 +36,35 @@ end
 
 class DatabaseEventModel
   include ActiveRecordFake
-  attr_accessor :name, :frequency, :at, :tz
+  attr_accessor :frequency, :at, :tz
 
   def name
-    @name || "#{self.class}:#{id}"
+    if instance_variable_defined?("@name")
+      @name
+    else
+      "#{self.class}:#{id}"
+    end
+  end
+
+  def name=(name)
+    @name = name
   end
 end
 
 class DatabaseEventModel2
   include ActiveRecordFake
-  attr_accessor :name, :frequency, :at, :tz
+  attr_accessor :frequency, :at, :tz
 
   def name
-    @name || "#{self.class}:#{id}"
+    if instance_variable_defined?("@name")
+      @name
+    else
+      "#{self.class}:#{id}"
+    end
+  end
+
+  def name=(name)
+    @name = name
   end
 end
 
@@ -59,10 +75,18 @@ end
 
 class DatabaseEventModelWithIf
   include ActiveRecordFake
-  attr_accessor :name, :frequency, :at, :tz, :if_state
+  attr_accessor :frequency, :at, :tz, :if_state
 
   def name
-    @name || "#{self.class}:#{id}"
+    if instance_variable_defined?("@name")
+      @name
+    else
+      "#{self.class}:#{id}"
+    end
+  end
+
+  def name=(name)
+    @name = name
   end
 
   def if?(time)
