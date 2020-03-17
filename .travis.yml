@@ -9,8 +9,8 @@ before_install:
   - gem install bundler -v '< 2'
 rvm:
   - 2.3.8
-  - 2.4.5
-  - 2.5.3
+  - 2.4.9
+  - 2.5.7
   - jruby-9.1.17.0
   - jruby-9.2.6.0
 gemfile:
