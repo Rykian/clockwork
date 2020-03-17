@@ -28,8 +28,8 @@ module ActiveRecordFake
   end
 
   module ClassMethods
-    def create *args
-      new *args
+    def create(*args)
+      new(*args)
     end
     
     def delete_all
