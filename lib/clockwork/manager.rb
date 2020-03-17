@@ -37,7 +37,7 @@ module Clockwork
 
     def error_handler(&block)
       @error_handler = block if block_given?
-      @error_handler
+      @error_handler if instance_variable_defined?("@error_handler")
     end
 
     def on(event, options={}, &block)
