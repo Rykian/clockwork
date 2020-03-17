@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'mocha/setup'
+require 'mocha/minitest'
 require 'fileutils'
 
 class SignalTest < Test::Unit::TestCase

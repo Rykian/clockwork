@@ -1,5 +1,5 @@
 require "minitest/autorun"
-require 'mocha/setup'
+require 'mocha/minitest'
 require 'time'
 require 'active_support/time'
 

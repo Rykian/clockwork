@@ -1,6 +1,6 @@
 require File.expand_path('../../lib/clockwork', __FILE__)
 require 'minitest/autorun'
-require 'mocha/setup'
+require 'mocha/minitest'
 
 describe Clockwork do
   before do
