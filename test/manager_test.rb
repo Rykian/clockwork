@@ -370,8 +370,10 @@ describe Clockwork::Manager do
   describe 'error_handler' do
     before do
       @errors = []
-      @manager.error_handler do |e|
+      @events = []
+      @manager.error_handler do |e, event|
         @errors << e
+        @events << event
       end
 
       # block error log
@@ -385,6 +387,11 @@ describe Clockwork::Manager do
     it 'registered error_handler handles error from event' do
       @manager.tick
       assert_equal ['it error'], @errors.map(&:message)
+    end
+
+    it 'registered error_handler gets event that caused the error' do
+      @manager.tick
+      assert_equal ['myjob'], @events.map(&:job)
     end
 
     it 'error is notified to logger and handler' do
