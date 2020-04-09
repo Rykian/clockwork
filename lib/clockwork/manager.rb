@@ -2,6 +2,8 @@ module Clockwork
   class Manager
     class NoHandlerDefined < RuntimeError; end
 
+    LOG_LEVELS = %i[debug info warn error fatal unknown]
+
     attr_reader :config
 
     def initialize
@@ -26,7 +28,7 @@ module Clockwork
     end
 
     def default_configuration
-      { :sleep_timeout => 1, :logger => Logger.new(STDOUT), :thread => false, :max_threads => 10 }
+      { :sleep_timeout => 1, :logger => Logger.new(STDOUT), :log_level => :info, :thread => false, :max_threads => 10 }
     end
 
     def handler(&block)
@@ -155,7 +157,7 @@ module Clockwork
     end
 
     def log(msg)
-      config[:logger].info(msg)
+      config[:logger].send(log_level, msg)
     end
 
     private
@@ -182,6 +184,11 @@ module Clockwork
         each_options[:at] = at
         register(period, job, block, each_options)
       end
+    end
+
+    def log_level
+      return config[:log_level] if LOG_LEVELS.include?(config[:log_level])
+      :info
     end
   end
 end

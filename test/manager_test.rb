@@ -136,6 +136,7 @@ describe Clockwork::Manager do
     @manager.configure do |config|
       config[:sleep_timeout] = 200
       config[:logger] = "A Logger"
+      config[:log_level] = :debug
       config[:max_threads] = 10
       config[:thread] = true
     end
@@ -144,6 +145,7 @@ describe Clockwork::Manager do
     assert_equal "A Logger", @manager.config[:logger]
     assert_equal 10, @manager.config[:max_threads]
     assert_equal true, @manager.config[:thread]
+    assert_equal :debug, @manager.config[:log_level]
   end
 
   it "configuration should have reasonable defaults" do
@@ -151,6 +153,7 @@ describe Clockwork::Manager do
     assert @manager.config[:logger].is_a?(Logger)
     assert_equal 10, @manager.config[:max_threads]
     assert_equal false, @manager.config[:thread]
+    assert_equal :info, @manager.config[:log_level]
   end
 
   it "should accept unnamed job" do
@@ -399,6 +402,46 @@ describe Clockwork::Manager do
       assert_raises(RuntimeError, 'it error re-raised') do
         @manager.tick
       end
+    end
+  end
+
+  describe 'log' do
+    before do
+      @lmanager = Clockwork::Manager.new
+      @lmanager.handler { }
+    end
+
+    it 'uses info as default level' do
+      mocked_logger = MiniTest::Mock.new
+      mocked_logger.expect :info, true, ['something fancy']
+      @lmanager.configure { |c| c[:logger] = mocked_logger }
+      @lmanager.log('something fancy')
+      @lmanager.tick(Time.now)
+      mocked_logger.verify
+    end
+
+    it 'uses the configured log level' do
+      mocked_logger = MiniTest::Mock.new
+      mocked_logger.expect :debug, true, ['something really fancy']
+      @lmanager.configure do |c|
+        c[:logger] = mocked_logger
+        c[:log_level] = :debug
+      end
+      @lmanager.log('something really fancy')
+      @lmanager.tick(Time.now)
+      mocked_logger.verify
+    end
+
+    it 'falls back to info if an invalid level is given' do
+      mocked_logger = MiniTest::Mock.new
+      mocked_logger.expect :info, true, ['something really fancy']
+      @lmanager.configure do |c|
+        c[:logger] = mocked_logger
+        c[:log_level] = :bad_and_dangerous_method
+      end
+      @lmanager.log('something really fancy')
+      @lmanager.tick(Time.now)
+      mocked_logger.verify
     end
   end
 end
