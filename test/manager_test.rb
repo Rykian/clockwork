@@ -80,6 +80,13 @@ describe Clockwork::Manager do
     end
   end
 
+  it "aborts when there are multiple jobs with the same name" do
+    assert_raises(Clockwork::Manager::DuplicateEventNames) do
+      @manager.every(1.minute, "jobx")
+      @manager.every(2.minutes, "jobx")
+    end
+  end
+
   it "general handler" do
     $set_me = 0
     @manager.handler { $set_me = 1 }
@@ -155,12 +162,28 @@ describe Clockwork::Manager do
 
   it "should accept unnamed job" do
     event = @manager.every(1.minute)
-    assert_equal 'unnamed', event.job
+    assert_equal 'unnamed_0', event.job
   end
 
   it "should accept options without job name" do
     event = @manager.every(1.minute, {})
-    assert_equal 'unnamed', event.job
+    assert_equal 'unnamed_0', event.job
+  end
+
+  it "should accept multiple unnamed jobs" do
+    event = @manager.every(1.minute)
+    event2 = @manager.every(2.minutes)
+
+    assert_equal "unnamed_0", event.job
+    assert_equal "unnamed_1", event2.job
+  end
+
+  it "should accept multiple options without job name" do
+    event = @manager.every(1.minute, {})
+    event2 = @manager.every(2.minute, {})
+
+    assert_equal "unnamed_0", event.job
+    assert_equal "unnamed_1", event2.job
   end
 
   describe ':at option' do
