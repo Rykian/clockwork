@@ -36,6 +36,7 @@ module Clockwork
     def run(time)
       @manager.log "Triggering '#{self}'"
       @last = convert_timezone(time)
+
       if thread?
         if @manager.thread_available?
           thread = Thread.new { execute }
@@ -62,7 +63,7 @@ module Clockwork
     rescue StandardError => e
       error = e
       @manager.log_error e
-      @manager.handle_error e
+      @manager.handle_error(@job, e)
     ensure
       finish = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       duration = ((finish - start) * 1000).round # milliseconds
