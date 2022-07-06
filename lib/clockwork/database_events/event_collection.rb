@@ -1,8 +1,7 @@
 module Clockwork
   module DatabaseEvents
     class EventCollection
-
-      def initialize(manager=Clockwork.manager)
+      def initialize(manager = Clockwork.manager)
         @events = []
         @manager = manager
       end
@@ -17,15 +16,15 @@ module Clockwork
         ignored_attributes = model.ignored_attributes if model.respond_to?(:ignored_attributes)
         ignored_attributes ||= []
 
-        model_attributes = model.attributes.select do |k, _|
-          not ignored_attributes.include?(k.to_sym)
+        model_attributes = model.attributes.reject do |k, _|
+          ignored_attributes.include?(k.to_sym)
         end
 
         event.model_attributes != model_attributes
       end
 
       def unregister
-        events.each{|e| manager.unregister(e) }
+        events.each { |e| manager.unregister(e) }
       end
 
       private

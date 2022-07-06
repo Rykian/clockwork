@@ -2,6 +2,8 @@ module Clockwork
   class Manager
     class NoHandlerDefined < RuntimeError; end
 
+    SUPPORTED_CALLBACKS = %i[before_tick after_tick before_run after_run].freeze
+
     attr_reader :config
 
     def initialize
@@ -20,36 +22,37 @@ module Clockwork
 
     def configure
       yield(config)
-      if config[:sleep_timeout] < 1
-        config[:logger].warn 'sleep_timeout must be >= 1 second'
-      end
+      config[:logger].warn 'sleep_timeout must be >= 1 second' if config[:sleep_timeout] < 1
     end
 
     def default_configuration
-      { :sleep_timeout => 1, :logger => Logger.new(STDOUT), :thread => false, :max_threads => 10 }
+      { sleep_timeout: 1, logger: Logger.new($stdout), thread: false, max_threads: 10 }
     end
 
     def handler(&block)
       @handler = block if block_given?
       raise NoHandlerDefined unless @handler
+
       @handler
     end
 
     def error_handler(&block)
       @error_handler = block if block_given?
-      @error_handler if instance_variable_defined?("@error_handler")
+      @error_handler if instance_variable_defined?('@error_handler')
     end
 
-    def on(event, options={}, &block)
-      raise "Unsupported callback #{event}" unless [:before_tick, :after_tick, :before_run, :after_run].include?(event.to_sym)
-      (@callbacks[event.to_sym]||=[]) << block
+    def on(event, _options = {}, &block)
+      raise "Unsupported callback #{event}" unless SUPPORTED_CALLBACKS.include?(event.to_sym)
+
+      (@callbacks[event.to_sym] ||= []) << block
     end
 
-    def every(period, job='unnamed', options={}, &block)
-      if job.is_a?(Hash) and options.empty?
+    def every(period, job = 'unnamed', options = {}, &block)
+      if job.is_a?(Hash) && options.empty?
         options = job
-        job = "unnamed"
+        job = 'unnamed'
       end
+
       if options[:at].respond_to?(:each)
         every_with_multiple_times(period, job, options, &block)
       else
@@ -74,7 +77,7 @@ module Clockwork
 
       run_tick_loop
 
-      while io = IO.select([sig_read])
+      while (io = IO.select([sig_read]))
         sig = io.first[0].gets.chomp
         handle_signal(sig)
       end
@@ -122,17 +125,17 @@ module Clockwork
           until @finish
             tick
             interval = config[:sleep_timeout] - Time.now.subsec + 0.001
-            @condvar.wait(@mutex, interval) if interval > 0
+            @condvar.wait(@mutex, interval) if interval.positive?
           end
         end
       end
     end
 
-    def tick(t=Time.now)
-      if (fire_callbacks(:before_tick))
+    def tick(t = Time.now)
+      if fire_callbacks(:before_tick)
         events = events_to_run(t)
         events.each do |event|
-          if (fire_callbacks(:before_run, event, t))
+          if fire_callbacks(:before_run, event, t)
             event.run(t)
             fire_callbacks(:after_run, event, t)
           end
@@ -146,12 +149,12 @@ module Clockwork
       config[:logger]
     end
 
-    def log_error(e)
-      config[:logger].error(e)
+    def log_error(error)
+      config[:logger].error(error)
     end
 
-    def handle_error(e)
-      error_handler.call(e) if error_handler
+    def handle_error(error)
+      error_handler&.call(error)
     end
 
     def log(msg)
@@ -159,14 +162,13 @@ module Clockwork
     end
 
     private
-    def events_to_run(t)
+
+    def events_to_run(time)
       @events.select do |event|
-        begin
-          event.run_now?(t)
-        rescue => e
-          log_error(e)
-          false
-        end
+        event.run_now?(time)
+      rescue StandardError => e
+        log_error(e)
+        false
       end
     end
 
@@ -176,7 +178,7 @@ module Clockwork
       event
     end
 
-    def every_with_multiple_times(period, job, options={}, &block)
+    def every_with_multiple_times(period, job, options = {}, &block)
       each_options = options.clone
       options[:at].each do |at|
         each_options[:at] = at

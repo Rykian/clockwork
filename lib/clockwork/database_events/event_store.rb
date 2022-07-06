@@ -24,11 +24,8 @@ require_relative './event_collection'
 #   - it creates a new DatabaseEvents::Event
 #   - DatabaseEvents::Event#initialize registers it with the EventStore
 module Clockwork
-
   module DatabaseEvents
-
     class EventStore
-
       def initialize(block_to_perform_on_event_trigger)
         @related_events = {}
         @block_to_perform_on_event_trigger = block_to_perform_on_event_trigger
@@ -49,7 +46,7 @@ module Clockwork
 
       def unregister_all_except(model_objects)
         ids = model_objects.collect(&:id)
-        (@related_events.keys - ids).each{|id| unregister(id) }
+        (@related_events.keys - ids).each { |id| unregister(id) }
       end
 
       def update_registered_models(model_objects)
@@ -84,11 +81,11 @@ module Clockwork
       end
 
       def registered_models(model_objects)
-        model_objects.select{|m| registered?(m) }
+        model_objects.select { |m| registered?(m) }
       end
 
       def unregistered_models(model_objects)
-        model_objects.select{|m| !registered?(m) }
+        model_objects.reject { |m| registered?(m) }
       end
 
       def unregister(id)
@@ -103,28 +100,31 @@ module Clockwork
       # called, which creates a new DatabaseEvent::Event, which will be
       # registered with the EventStore on #initialize.
       def register_with_manager(model)
-        Clockwork.manager.
-          every(model.frequency, model, options(model),
-                &@block_to_perform_on_event_trigger)
+        Clockwork.manager.every(
+          model.frequency,
+          model,
+          options(model),
+          &@block_to_perform_on_event_trigger
+        )
       end
 
       def options(model)
         options = {
-          :from_database => true,
-          :synchronizer => self,
-          :ignored_attributes => [],
+          from_database: true,
+          synchronizer: self,
+          ignored_attributes: []
         }
 
         options[:at] = at_strings_for(model) if model.respond_to?(:at)
-        options[:if] = ->(time){ model.if?(time) } if model.respond_to?(:if?)
+        options[:if] = ->(time) { model.if?(time) } if model.respond_to?(:if?)
         options[:tz] = model.tz if model.respond_to?(:tz)
         options[:ignored_attributes] = model.ignored_attributes if model.respond_to?(:ignored_attributes)
         options[:skip_first_run] = model.skip_first_run if model.respond_to?(:skip_first_run)
 
         # store the state of the model at time of registering so we can
         # easily compare and determine if state has changed later
-        options[:model_attributes] = model.attributes.select do |k, v|
-          not options[:ignored_attributes].include?(k.to_sym)
+        options[:model_attributes] = model.attributes.reject do |k, _v|
+          options[:ignored_attributes].include?(k.to_sym)
         end
 
         options
@@ -136,6 +136,5 @@ module Clockwork
         model.at.split(',').map(&:strip)
       end
     end
-
   end
 end

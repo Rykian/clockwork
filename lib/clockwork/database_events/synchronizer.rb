@@ -1,12 +1,9 @@
 module Clockwork
-
   module DatabaseEvents
-
     class Synchronizer
-
-      def self.setup(options={}, &block_to_perform_on_event_trigger)
-        model_class = options.fetch(:model) { raise KeyError, ":model must be set to the model class" }
-        every = options.fetch(:every) { raise KeyError, ":every must be set to the database sync frequency" }
+      def self.setup(options = {}, &block_to_perform_on_event_trigger)
+        model_class = options.fetch(:model) { raise KeyError, ':model must be set to the model class' }
+        every = options.fetch(:every) { raise KeyError, ':every must be set to the database sync frequency' }
 
         event_store = EventStore.new(block_to_perform_on_event_trigger)
 
@@ -16,6 +13,5 @@ module Clockwork
         end
       end
     end
-
   end
 end

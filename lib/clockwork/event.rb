@@ -2,7 +2,7 @@ module Clockwork
   class Event
     attr_accessor :job, :last
 
-    def initialize(manager, period, job, block, options={})
+    def initialize(manager, period, job, block, options = {})
       validate_if_option(options[:if])
       @manager = manager
       @period = period
@@ -16,15 +16,16 @@ module Clockwork
       @last = @skip_first_run ? convert_timezone(Time.now) : nil
     end
 
-    def convert_timezone(t)
-      @timezone ? t.in_time_zone(@timezone) : t
+    def convert_timezone(time)
+      @timezone ? time.in_time_zone(@timezone) : time
     end
 
-    def run_now?(t)
-      t = convert_timezone(t)
-      return false unless elapsed_ready?(t)
-      return false unless run_at?(t)
-      return false unless run_if?(t)
+    def run_now?(time)
+      time = convert_timezone(time)
+      return false unless elapsed_ready?(time)
+      return false unless run_at?(time)
+      return false unless run_if?(time)
+
       true
     end
 
@@ -32,15 +33,13 @@ module Clockwork
       @thread
     end
 
-    def run(t)
+    def run(time)
       @manager.log "Triggering '#{self}'"
-      @last = convert_timezone(t)
+      @last = convert_timezone(time)
       if thread?
         if @manager.thread_available?
-          t = Thread.new do
-            execute
-          end
-          t['creator'] = @manager
+          thread = Thread.new { execute }
+          thread['creator'] = @manager
         else
           @manager.log_error "Threads exhausted; skipping #{self}"
         end
@@ -54,12 +53,13 @@ module Clockwork
     end
 
     private
+
     def execute
       start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       error = nil
 
       @block.call(@job, @last)
-    rescue => e
+    rescue StandardError => e
       error = e
       @manager.log_error e
       @manager.handle_error e
@@ -70,22 +70,22 @@ module Clockwork
       @manager.log "Finished '#{self}' duration_ms=#{duration} error=#{error.inspect}"
     end
 
-    def elapsed_ready?(t)
-      @last.nil? || (t - @last.to_i).to_i >= @period
+    def elapsed_ready?(time)
+      @last.nil? || (time - @last.to_i).to_i >= @period
     end
 
-    def run_at?(t)
-      @at.nil? || @at.ready?(t)
+    def run_at?(time)
+      @at.nil? || @at.ready?(time)
     end
 
-    def run_if?(t)
-      @if.nil? || @if.call(t)
+    def run_if?(time)
+      @if.nil? || @if.call(time)
     end
 
     def validate_if_option(if_option)
-      if if_option && !if_option.respond_to?(:call)
-        raise ArgumentError.new(':if expects a callable object, but #{if_option} does not respond to call')
-      end
+      return unless if_option && !if_option.respond_to?(:call)
+
+      raise ArgumentError, ':if expects a callable object, but `if_option` does not respond to call'
     end
   end
 end

@@ -9,7 +9,7 @@ require 'clockwork/manager'
 module Clockwork
   class << self
     def included(klass)
-      klass.send "include", Methods
+      klass.send 'include', Methods
       klass.extend Methods
     end
 
@@ -17,9 +17,7 @@ module Clockwork
       @manager ||= Manager.new
     end
 
-    def manager=(manager)
-      @manager = manager
-    end
+    attr_writer :manager
   end
 
   module Methods
@@ -35,11 +33,11 @@ module Clockwork
       Clockwork.manager.error_handler(&block)
     end
 
-    def on(event, options={}, &block)
+    def on(event, options = {}, &block)
       Clockwork.manager.on(event, options, &block)
     end
 
-    def every(period, job, options={}, &block)
+    def every(period, job, options = {}, &block)
       Clockwork.manager.every(period, job, options, &block)
     end
 
