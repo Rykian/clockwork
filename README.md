@@ -1,18 +1,20 @@
-Clockwork - a clock process to replace cron [![Build Status](https://api.travis-ci.com/Rykian/clockwork.svg?branch=master)](https://travis-ci.org/Rykian/clockwork)
-===========================================
+# Clockwork
+
+### A clock process to replace cron
+
+[![Build Status](https://api.travis-ci.com/Rykian/clockwork.svg?branch=master)](https://travis-ci.org/Rykian/clockwork)
 
 Cron is non-ideal for running scheduled application tasks, especially in an app
-deployed to multiple machines.  [More details.](http://adam.herokuapp.com/past/2010/4/13/rethinking_cron/)
+deployed to multiple machines. [More details.](http://adam.herokuapp.com/past/2010/4/13/rethinking_cron/)
 
-Clockwork is a cron replacement.  It runs as a lightweight, long-running Ruby
+Clockwork is a cron replacement. It runs as a lightweight, long-running Ruby
 process which sits alongside your web processes (Mongrel/Thin) and your worker
 processes (DJ/Resque/Minion/Stalker) to schedule recurring work at particular
-times or dates.  For example, refreshing feeds on an hourly basis, or send
+times or dates. For example, refreshing feeds on an hourly basis, or send
 reminder emails on a nightly basis, or generating invoices once a month on the
 1st.
 
-Quickstart
-----------
+## Quickstart
 
 Create clock.rb:
 
@@ -55,28 +57,21 @@ require './config/environment'
 
 under the `require 'clockwork'` declaration.
 
-Quickstart for Heroku
----------------------
+## Quickstart for Heroku
 
 Clockwork fits well with heroku's cedar stack.
 
 Consider using [clockwork-init.sh](https://gist.github.com/tomykaira/1312172) to create
 a new project for Heroku.
 
-Use with queueing
------------------
+## Use with queueing
 
-The clock process only makes sense as a place to schedule work to be done, not
-to do the work.  It avoids locking by running as a single process, but this
-makes it impossible to parallelize.  For doing the work, you should be using a
-job queueing system, such as
+The clock process only makes sense as a place to schedule work to be done, not to do the work. It avoids locking by running as a single process, but this makes it impossible to parallelize. For doing the work, you should be using a job queueing system, such as
 [Delayed Job](http://www.therailsway.com/2009/7/22/do-it-later-with-delayed-job),
 [Beanstalk/Stalker](http://adam.herokuapp.com/past/2010/4/24/beanstalk_a_simple_and_fast_queueing_backend/),
 [RabbitMQ/Minion](http://adam.herokuapp.com/past/2009/9/28/background_jobs_with_rabbitmq_and_minion/),
 [Resque](http://github.com/blog/542-introducing-resque), or
-[Sidekiq](https://github.com/mperham/sidekiq).  This design allows a
-simple clock process with no locks, but also offers near infinite horizontal
-scalability.
+[Sidekiq](https://github.com/mperham/sidekiq). This design allows a simple clock process with no locks, but also offers near infinite horizontal scalability.
 
 For example, if you're using Beanstalk/Stalker:
 
@@ -92,11 +87,8 @@ module Clockwork
 end
 ```
 
-Using a queueing system which doesn't require that your full application be
-loaded is preferable, because the clock process can keep a tiny memory
-footprint.  If you're using DJ or Resque, however, you can go ahead and load
-your full application environment, and use per-event blocks to call DJ or Resque
-enqueue methods.  For example, with DJ/Rails:
+Using a queueing system which doesn't require that your full application be loaded is preferable, because the clock process can keep a tiny memory footprint. If you're using DJ or Resque, however, you can go ahead and load your full application environment, and use per-event blocks to call DJ or Resque
+enqueue methods. For example, with DJ/Rails:
 
 ```ruby
 require 'config/boot'
@@ -106,8 +98,7 @@ every(1.hour, 'feeds.refresh') { Feed.send_later(:refresh) }
 every(1.day, 'reminders.send', :at => '01:30') { Reminder.send_later(:send_reminders) }
 ```
 
-Use with database events
------------------------
+## Use with database events
 
 In addition to managing static events in your `clock.rb`, you can configure clockwork to synchronise with dynamic events from a database. Like static events, these database-backed events say when they should be run, and how frequently; the difference being that if you change those settings in the database, they will be reflected in clockwork.
 
@@ -156,22 +147,23 @@ When one of the events is ready to be run (based on it's `frequency`, and possib
 1. the class responds to `all` returning an array of instances from the database
 
 2. the instances returned respond to:
+
    - `id` returning a unique identifier (this is needed to track changes to event settings)
    - `frequency` returning the how frequently (in seconds) the database event should be run
 
    - `attributes` returning a hash of [attribute name] => [attribute value] values (or really anything that we can use store on registering the event, and then compare again to see if the state has changed later)
 
-   - `at` *(optional)* return any acceptable clockwork `:at` string
+   - `at` _(optional)_ return any acceptable clockwork `:at` string
 
-   - `name` *(optional)* returning the name for the event (used to identify it in the Clockwork output)
+   - `name` _(optional)_ returning the name for the event (used to identify it in the Clockwork output)
 
-   - `if?`*(optional)*  returning either true or false, depending on whether the database event should run at the given time (this method will be passed the time as a parameter, much like the standard clockwork `:if`)
+   - `if?`_(optional)_ returning either true or false, depending on whether the database event should run at the given time (this method will be passed the time as a parameter, much like the standard clockwork `:if`)
 
-   - `ignored_attributes` *(optional)* returning an array of model attributes (as symbols) to ignore when determining whether the database event has been modified since our last run
+   - `ignored_attributes` _(optional)_ returning an array of model attributes (as symbols) to ignore when determining whether the database event has been modified since our last run
 
-   - `tz` *(optional)* returning the timezone to use (default is the local timezone)
+   - `tz` _(optional)_ returning the timezone to use (default is the local timezone)
 
-   - `skip_first_run` *(optional)* self explanatory, see [dedicated section](#skip_first_run)
+   - `skip_first_run` _(optional)_ self explanatory, see [dedicated section](#skip_first_run)
 
 #### Example Setup
 
@@ -272,9 +264,7 @@ class ClockworkDatabaseEvent < ActiveRecord::Base
 end
 ```
 
-
-Event Parameters
-----------
+## Event Parameters
 
 ### :at
 
@@ -349,7 +339,7 @@ Clockwork.every(1.day, 'myjob', :if => lambda { |t| t.day == 1 })
 
 The argument is an instance of `ActiveSupport::TimeWithZone` if the `:tz` option is set. Otherwise, it's an instance of `Time`.
 
-This argument cannot be omitted.  Please use _ as placeholder if not needed.
+This argument cannot be omitted. Please use \_ as placeholder if not needed.
 
 ```ruby
 Clockwork.every(1.second, 'myjob', :if => lambda { |_| true })
@@ -381,9 +371,7 @@ Clockwork.every(5.minutes, 'myjob', :skip_first_run => true)
 
 The above job will not run at initial boot, and instead run every 5 minutes after boot.
 
-
-Configuration
------------------------
+## Configuration
 
 Clockwork exposes a couple of configuration options:
 
@@ -401,18 +389,17 @@ From 1.1.0, Clockwork does not accept `sleep_timeout` less than 1 seconds.
 
 ### :tz
 
-This is the default timezone to use for all events.  When not specified this defaults to the local
-timezone.  Specifying :tz in the parameters for an event overrides anything set here.
+This is the default timezone to use for all events. When not specified this defaults to the local
+timezone. Specifying :tz in the parameters for an event overrides anything set here.
 
 ### :max_threads
 
 Clockwork runs handlers in threads. If it exceeds `max_threads`, it will warn you (log an error) about missing
 jobs.
 
-
 ### :thread
 
-Boolean true or false. Default is false. If set to true, every event will be run in its own thread. Can be overridden on a per event basis (see the ```:thread``` option in the Event Parameters section above)
+Boolean true or false. Default is false. If set to true, every event will be run in its own thread. Can be overridden on a per event basis (see the `:thread` option in the Event Parameters section above)
 
 ### Configuration example
 
@@ -434,8 +421,8 @@ You can add error_handler to define your own logging or error rescue.
 
 ```ruby
 module Clockwork
-  error_handler do |error|
-    Airbrake.notify_or_ignore(error)
+  error_handler do |job_name, error|
+    Honeybadger.notify(error, context: { job_name: job_name })
   end
 end
 ```
@@ -447,18 +434,14 @@ Current specifications are as follows.
 
 Any suggestion about these specifications is welcome.
 
-Old style
----------
+## Old style
 
 `include Clockwork` is old style.
 The old style is still supported, though not recommended, because it pollutes the global namespace.
 
+## Anatomy of a clock file
 
-
-Anatomy of a clock file
------------------------
-
-clock.rb is standard Ruby.  Since we include the Clockwork module (the
+clock.rb is standard Ruby. Since we include the Clockwork module (the
 clockwork executable does this automatically, or you can do it explicitly), this
 exposes a small DSL to define the handler for events, and then the events themselves.
 
@@ -469,7 +452,7 @@ handler { |job| enqueue_your_job(job) }
 ```
 
 This block will be invoked every time an event is triggered, with the job name
-passed in.  In most cases, you should be able to pass the job name directly
+passed in. In most cases, you should be able to pass the job name directly
 through to your queueing system.
 
 The second part of the file, which lists the events, roughly resembles a crontab:
@@ -480,11 +463,11 @@ every(1.hour, 'otherthing.do')
 ```
 
 In the first line of this example, an event will be triggered once every five
-minutes, passing the job name 'thing.do' into the handler.  The handler shown
+minutes, passing the job name 'thing.do' into the handler. The handler shown
 above would thus call enqueue_your_job('thing.do').
 
 You can also pass a custom block to the handler, for job queueing systems that
-rely on classes rather than job names (i.e. DJ and Resque).  In this case, you
+rely on classes rather than job names (i.e. DJ and Resque). In this case, you
 need not define a general event handler, and instead provide one with each
 event:
 
@@ -535,26 +518,24 @@ end
 
 You can use multiple `sync_database_events` if you wish, so long as you use different model classes for each (ActiveRecord Single Table Inheritance could be a good idea if you're doing this).
 
-In production
--------------
+## In production
 
 Only one clock process should ever be running across your whole application
-deployment.  For example, if your app is running on three VPS machines (two app
+deployment. For example, if your app is running on three VPS machines (two app
 servers and one database), your app machines might have the following process
 topography:
 
-* App server 1: 3 web (thin start), 3 workers (rake jobs:work), 1 clock (clockwork clock.rb)
-* App server 2: 3 web (thin start), 3 workers (rake jobs:work)
+- App server 1: 3 web (thin start), 3 workers (rake jobs:work), 1 clock (clockwork clock.rb)
+- App server 2: 3 web (thin start), 3 workers (rake jobs:work)
 
 You should use [Monit](http://mmonit.com/monit/), [God](https://github.com/mojombo/god), [Upstart](http://upstart.ubuntu.com/), or [Inittab](http://www.tldp.org/LDP/sag/html/config-init.html) to keep your clock process
 running the same way you keep your web and workers running.
 
-Daemonization
--------------
+## Daemonization
 
 Thanks to @fddayan, `clockworkd` executes clockwork script as a daemon.
 
-You will need the [daemons gem](https://github.com/ghazel/daemons) to use `clockworkd`.  It is not automatically installed, please install by yourself.
+You will need the [daemons gem](https://github.com/ghazel/daemons) to use `clockworkd`. It is not automatically installed, please install by yourself.
 
 Then,
 
@@ -564,15 +545,14 @@ clockworkd -c YOUR_CLOCK.rb start
 
 For more details, you can run `clockworkd -h`.
 
-Integration Testing
--------------------
+## Integration Testing
 
 You could take a look at:
-* [clockwork-mocks](https://github.com/dpoetzsch/clockwork-mocks) that helps with running scheduled tasks during integration testing.
-* [clockwork-test](https://github.com/kevin-j-m/clockwork-test) which ensures that tasks are triggered at the right time
 
-Issues and Pull requests
-------------------------
+- [clockwork-mocks](https://github.com/dpoetzsch/clockwork-mocks) that helps with running scheduled tasks during integration testing.
+- [clockwork-test](https://github.com/kevin-j-m/clockwork-test) which ensures that tasks are triggered at the right time
+
+## Issues and Pull requests
 
 If you find a bug, please create an issue - [Issues · Rykian/clockwork](https://github.com/Rykian/clockwork/issues).
 
@@ -585,18 +565,17 @@ In most cases, directly operating `Manager` realizes an idea, without touching t
 If you discover a new way to use Clockwork, please create a gist page or an article on your website, then add it to the following "Use cases" section.
 This tool is already used in various environment, so backward-incompatible requests will be mostly rejected.
 
-Use cases
----------
+## Use cases
 
 Feel free to add your idea or experience and send a pull-request.
 
 - Sending errors to Airbrake
 - Read events from a database
 
-Meta
-----
+## Meta
 
-Created by Adam Wiggins
+Created by Adam Wiggins.
+Version 4 released by Rafael Baldasso Audibert while working at [LeadSimple](https://leadsimple.com)
 
 Inspired by [rufus-scheduler](https://github.com/jmettraux/rufus-scheduler) and [resque-scheduler](https://github.com/bvandenbos/resque-scheduler)
 
@@ -606,4 +585,4 @@ Patches contributed by Mark McGranaghan and Lukáš Konarovský
 
 Released under the MIT License: http://www.opensource.org/licenses/mit-license.php
 
-https://github.com/Rykian/clockwork
+https://github.com/LeadSimple/clockwork
