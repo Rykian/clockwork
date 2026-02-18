@@ -3,6 +3,7 @@ require "minitest/autorun"
 require 'mocha/minitest'
 require 'time'
 require 'active_support/time'
+require 'stringio'
 
 describe Clockwork::Manager do
   before do
@@ -117,7 +118,7 @@ describe Clockwork::Manager do
     @manager.handler { raise 'boom' }
     @manager.every(1.minute, 'myjob')
 
-    mocked_logger = MiniTest::Mock.new
+    mocked_logger = Minitest::Mock.new
     mocked_logger.expect :error, true, [RuntimeError]
     @manager.configure { |c| c[:logger] = mocked_logger }
     @manager.tick(Time.now)

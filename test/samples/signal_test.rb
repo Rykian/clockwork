@@ -1,5 +1,6 @@
 require 'clockwork'
 require 'active_support/time'
+require 'stringio'
 
 module Clockwork
   LOGFILE = File.expand_path('../../tmp/signal_test.log', __FILE__)
