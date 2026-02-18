@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency(%q<activesupport>)
   s.add_dependency(%q<base64>)
   s.add_dependency(%q<bigdecimal>)
+  s.add_dependency(%q<ostruct>)
 
   s.add_development_dependency "rake"
   s.add_development_dependency "daemons"
