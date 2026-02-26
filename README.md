@@ -287,6 +287,9 @@ Event Parameters
     **:MM
     HH:**
     (Mon|mon|Monday|monday) HH:MM
+    (Mon|mon|Monday|monday) HH:**
+    (Mon|mon|Monday|monday) **:MM
+    (Mon|mon|Monday|monday) **:**
 
 #### Examples
 
@@ -320,6 +323,10 @@ You can specify the day of week to run:
 
 ```ruby
 every(1.week, 'myjob', :at => 'Monday 16:20')
+# This runs every Monday at 16:20
+
+every(1.hour, 'myjob', :at => 'Monday **:**')
+# This runs every hour only on Mondays
 ```
 
 If another task is already running at the specified time, clockwork will skip execution of the task with the `:at` option.
