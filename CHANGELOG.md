@@ -1,3 +1,14 @@
+## 4.0.1 ##
+
+* Update ACTIVE_SUPPORT_VERSION default to 8.1 (81b6cd2)
+* Drop test-unit dependency with migrated test (eac1064)
+* Remove unused base64, bigdecimal and ostruct dependencies (f171d8f)
+
+## 4.0.0 ##
+
+* BREAKING CHANGE: Drop EOL versions of Ruby and ActiveSupport, drop JRuby support (4f0d4a7)
+* Add Spring DST fix for Issue 60 with tests (89f15ed)
+
 ## 3.0.2 ##
 
 * Fixing clockworkd on Ruby 3.2 (a73a9d5)
