@@ -593,6 +593,52 @@ Feel free to add your idea or experience and send a pull-request.
 - Sending errors to Airbrake
 - Read events from a database
 
+
+You can define an `at` method, which can make your clockwork file easier to read. And you can structure it using [Composed Method](https://www.informit.com/articles/article.aspx?p=1398607)
+
+```ruby
+module Tasks
+  class << self
+    def set_up
+      daily_tasks
+      twice_daily_tasks
+      miscellaneous_tasks
+    end
+
+    private
+
+      def at(time, name)
+        raise "No block found" unless block_given?
+
+        Clockwork.module_eval do
+          every(1.day, name, at: time, tz: "Europe/Amsterdam") { yield }
+        end
+      end
+
+      def daily_tasks
+        at("05:00", "cool_job") { CoolJob.perform_later }
+        at("16:00", "afternoon_job") { AfternoonJob.perform_async }
+      end
+
+      def twice_daily_tasks
+        at(["02:30", "14:00"], "jig_job") { JigJob.perform_async }
+        at(["04:30", "11:00"], "zag_job") { ZagJob.perform_async }
+      end
+
+      def miscellaneous_tasks
+        Clockwork.module_eval do
+          every(15.minutes, "nag_job") { NagJob.perform_async }
+          every(12.hours, "routine_job") { RoutineJob.perform_async }
+          every(1.week, "weekly_job",  at: "Monday 02:45", tz: "Europe/Amsterdam") { WeeklyJob.perform_async }
+        end
+      end
+  end
+end
+
+Tasks.set_up
+```
+
+
 Meta
 ----
 
