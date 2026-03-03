@@ -164,7 +164,7 @@ describe Clockwork::DatabaseEvents::Synchronizer do
       end
 
       describe "when #name is defined" do
-        it 'runs daily event with at from databse only once' do
+        it 'runs daily event with at from database only once' do
           DatabaseEventModel.create(:frequency => 1.day, :at => next_minute(@now).strftime('%H:%M'))
           setup_sync(model: DatabaseEventModel, :every => @sync_frequency, :events_run => @events_run)
 
