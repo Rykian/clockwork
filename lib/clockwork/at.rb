@@ -12,6 +12,12 @@ module Clockwork
     def self.parse(at)
       return unless at
       case at
+      when /\A([[:alpha:]]+)\s\*{1,2}:\*{1,2}\z/
+        if wday = WDAYS[$1]
+          new(NOT_SPECIFIED, NOT_SPECIFIED, wday)
+        else
+          raise FailedToParse, at
+        end
       when /\A([[:alpha:]]+)\s(.*)\z/
         if wday = WDAYS[$1]
           parsed_time = parse($2)
